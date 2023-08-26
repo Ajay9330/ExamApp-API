@@ -8,8 +8,9 @@ modelsMap.set('teacher', Teacher);
  
 const middleware = (req, res, next) => {
     const token = req.cookies.token; // Get token from cookies or headers
-    // console.log(token);
+    console.log(token);
     if (!token) {
+        console.log(req.body);
         return res.status(401).json({ error: 'Unauthorized: No token provided' });
     }
 
@@ -20,8 +21,9 @@ const middleware = (req, res, next) => {
         next(); // Move to the next middleware or route handler
     } catch (error) {
         console.log(error);
-        return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+        return res.status(401).json({ error: 'Unauthorized: Invalid token by middle' });
     }
+
 };
 
 const insertTestUser = async () => {
@@ -85,10 +87,53 @@ async function isValidUser(email, password, userType,newToken) {
     }
 }
 
+function generateAuthToken(email) {
+    const secretKey = 'key';
+    const expiresIn = '300s';
+    const token = jwt.sign({ email }, secretKey, { expiresIn });
+    return token;
+  }
 
+
+async function login (req, res)  {
+    const { email, password, userType } = req.body;
+    console.log(email + password + userType);
+    console.log("post request");
+  
+    try {
+      const token = generateAuthToken(email + 1000 * Math.random());
+  
+      const [isValid, id] = await isValidUser(email, password, userType, token);
+      console.log(id);
+      if (isValid) {
+        res.cookie('token', token, { httpOnly: false });
+        res.cookie('userType', userType);
+        res.cookie('email', email);
+        res.cookie('id', id);
+        res.status(200).json({ message: 'Login successful' });
+      } else {
+        res.status(401).json({ error: 'Invalid credentials' });
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  function logout(req, res) {
+    // Clear the cookies and session data
+    res.clearCookie('userType');
+    res.clearCookie('email');
+    res.clearCookie('obj');
+    res.clearCookie('id');
+    
+    // Respond with a success message
+    res.json({ message: 'Logged out successfully from server' });
+  };
 
 module.exports = {
+    logout,
     middleware,
-    isValidUser
+    isValidUser,login
 };
 

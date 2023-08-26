@@ -1,13 +1,15 @@
 const express = require('express');
-const cors = require('cors'); // Import cors module and use it as a function
+const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const d = require('dotenv');
 d.config({ path: './config.env' });
 require('./db/conn');
+const studentRoutes = require('./routes/studentRoutes');
+const teacherRoutes = require('./routes/teacherRoutes');
 
 const app = express();
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+app.use(cors({ credentials: true, origin: ['http://localhost:3000', '*'] }));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -15,43 +17,33 @@ const auth = require('./Auth/authenticate');
 const md = auth.middleware;
 
 // Placeholder function to simulate generating an authentication token
-function generateAuthToken(email) {
-  const secretKey = 'key';
-  const expiresIn = '30s';
-  const token = jwt.sign({ email }, secretKey, { expiresIn });
-  return token;
-}
+app.post('/login', auth.login);
 
-app.post('/login', async (req, res) => {
-  const { email, password, userType } = req.body;
-  console.log(email + password + userType);
-  console.log("post request");
+app.use(md);
+app.post('/logout', auth.logout);
 
-  try {
-    const token = generateAuthToken(email + 1000 * Math.random());
-
-    const [isValid, id] = await auth.isValidUser(email, password, userType, token);
-    console.log(id);
-    if (isValid) {
-      res.cookie('token', token, { httpOnly: false });
-      res.cookie('userType', userType);
-      res.cookie('email', email);
-      res.cookie('id', id);
-      res.status(200).json({ message: 'Login successful' });
-    } else {
-      res.status(401).json({ error: 'Invalid credentials' });
-    }
-  } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({ error: 'Internal server error' });
+// Define dashboard routes based on user type using router.use
+app.use('/', (req, res, next) => {
+  const userType = req.cookies.userType;
+  console.log('main route');
+  if (userType === 'student') {
+    studentRoutes(req, res, next);
+  } else if (userType === 'teacher') {
+    teacherRoutes(req, res, next);
+  } else {
+    console.log('main route2');
+    res.status(401).json({ error: 'Unauthorized route' });
   }
 });
 
-app.use(md);
-
-app.get('/', (req, res) => {
+app.get('/verify', (req, res) => {
   console.log("root");
-  res.send("Hello from the root route!");
+  res.status(200).send("Hello from the root route!");
+});
+
+// app.use('/', router);
+app.use((req, res) => {
+  res.status(404).send("Page not found");
 });
 
 const port = process.env.PORT || 3300;
