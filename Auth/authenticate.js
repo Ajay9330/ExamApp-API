@@ -8,7 +8,9 @@ modelsMap.set('teacher', Teacher);
  
 const middleware = (req, res, next) => {
     const token = req.cookies.token; // Get token from cookies or headers
-    console.log(token);
+    console.log("middleware called");
+    // console.log(token);
+    
     if (!token) {
         console.log(req.body);
         return res.status(401).json({ error: 'Unauthorized: No token provided' });
@@ -16,7 +18,7 @@ const middleware = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, 'key');
-        console.log(decoded);
+        // console.log(decoded);
         req.user = decoded; // Attach the decoded payload to the request object
         next(); // Move to the next middleware or route handler
     } catch (error) {
@@ -45,7 +47,7 @@ const insertTestUser = async () => {
 async function isValidUser(email, password, userType,newToken) {
 
     try {
-        console.log("Function entered");
+        console.log("Is validuser");
 
         let user; // Declare the user variable
         if([...modelsMap.keys()].includes(userType)){
@@ -89,13 +91,13 @@ async function isValidUser(email, password, userType,newToken) {
 
 function generateAuthToken(email) {
     const secretKey = 'key';
-    const expiresIn = '300s';
+    const expiresIn = '3000s';
     const token = jwt.sign({ email }, secretKey, { expiresIn });
     return token;
   }
 
 
-async function login (req, res)  {
+  async function login(req, res) {
     const { email, password, userType } = req.body;
     console.log(email + password + userType);
     console.log("post request");
@@ -106,10 +108,25 @@ async function login (req, res)  {
       const [isValid, id] = await isValidUser(email, password, userType, token);
       console.log(id);
       if (isValid) {
-        res.cookie('token', token, { httpOnly: false });
-        res.cookie('userType', userType);
-        res.cookie('email', email);
-        res.cookie('id', id);
+        // Set cookies securely with specific options
+        res.cookie('token', token, {
+          httpOnly: false,
+          sameSite: 'none', // Set to 'none' for cross-origin requests
+          secure: true,     // Set to true for secure connections (HTTPS)
+        });
+        res.cookie('userType', userType, {
+          sameSite: 'none',
+          secure: true,
+        });
+        res.cookie('email', email, {
+          sameSite: 'none',
+          secure: true,
+        });
+        res.cookie('id', id, {
+          sameSite: 'none',
+          secure: true,
+        });
+  
         res.status(200).json({ message: 'Login successful' });
       } else {
         res.status(401).json({ error: 'Invalid credentials' });
@@ -119,7 +136,7 @@ async function login (req, res)  {
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-
+  
   function logout(req, res) {
     // Clear the cookies and session data
     res.clearCookie('userType');

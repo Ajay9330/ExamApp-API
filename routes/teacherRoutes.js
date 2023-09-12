@@ -1,8 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const Teacher = require('../db/Models/teacherModel');
+const Student=require("../db/Models/studentModel");
 const CreateExam=require('../db/Models/CreateExam');
+const ExamResult=require('../db/Models/ExamResult');
 // Teacher-specific routes
+
+
+
+
+
+
+
 router.get('/profile', async (req, res) => {
   const teacherId = req.cookies.id;
   console.log("getting teacherprofile");
@@ -20,11 +29,11 @@ router.get('/profile', async (req, res) => {
   }
 });
 
-router.post('/add-user', async (req, res) => {
- 
-  const { userType, email, password } = req.body;
-  console.log('adding user');
 
+router.post('/add-user', async (req, res) => {
+  const { userType, email, password, ...otherFields } = req.body; // Spread other fields
+
+    // console.log( ...otherFields);
   try {
     let userModel;
 
@@ -43,7 +52,7 @@ router.post('/add-user', async (req, res) => {
     }
 
     // Create and save the new user
-    const newUser = new userModel({ email, password, ...req.body }); // Spread other fields
+    const newUser = new userModel({ email, password, ...otherFields }); // Spread other fields
     await newUser.save();
 
     res.status(201).json({ message: 'User added successfully' });
@@ -52,6 +61,42 @@ router.post('/add-user', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while adding user' });
   }
 });
+
+
+router.get('/search-user', async (req, res) => {
+  const searchQuery = req.query.q;
+
+  console.log(req.query);
+
+  try {
+    // Search for users in both Teacher and Student models
+
+    const teacherResults = await Teacher.find({
+      $or: [
+        { name: { $regex: searchQuery, $options: 'i' } },
+        { email: { $regex: searchQuery, $options: 'i' } },
+      ],
+    });
+    // console.log(teacherResults);
+
+    const studentResults = await Student.find({
+      $or: [
+        { name: { $regex: searchQuery } },
+        { email: { $regex: searchQuery } },
+      ],
+    });
+    // console.log(studentResults);
+
+    const results = [...teacherResults, ...studentResults]; // Combine the results
+    console.log(results);
+    res.status(200).json({ results });
+  } catch (error) {
+    console.error('Error searching for users:', error);
+    res.status(500).json({ error: 'An error occurred while searching for users' });
+  }
+});
+
+
 
    
   router.post('/createxams', async (req, res) => {
@@ -116,6 +161,32 @@ router.post('/add-user', async (req, res) => {
     }
   });
   
+
+
+  router.get('/exam-results/:examId', async (req, res) => {
+    console.log("exam-result");
+    const { examId } = req.params;
+  
+    try {
+      // Use your ExamResult model to find exam results by examId
+      const examResults = await ExamResult.find({ examId });
+  
+      if (!examResults) {
+        return res.status(404).json({ error: 'Exam results not found' });
+      }
+      console.log(examResults);
+  
+      // Return the exam results as JSON
+      res.status(200).json(examResults);
+    } catch (error) {
+      console.error('Error fetching exam results:', error);
+      res.status(500).json({ error: 'An error occurred while fetching exam results' });
+    }
+  });
+  
+
+
+
 
 
 module.exports = router;

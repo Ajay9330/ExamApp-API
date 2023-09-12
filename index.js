@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
 const d = require('dotenv');
 d.config({ path: './config.env' });
 require('./db/conn');
@@ -9,7 +8,33 @@ const studentRoutes = require('./routes/studentRoutes');
 const teacherRoutes = require('./routes/teacherRoutes');
 
 const app = express();
-app.use(cors({ credentials: true, origin: ['http://localhost:3000', '*'] }));
+
+const corsOptions = {
+  origin:true,
+  methods: ['GET', 'POST','DELETE'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+
+
+// enable cors
+// app.use(
+//   cors({
+//     origin: true,
+//     optionsSuccessStatus: 200,
+//     credentials: true,
+//   })
+// );
+// app.options(
+//   '*',
+//   cors({
+//     origin: true,
+//     optionsSuccessStatus: 200,
+//     credentials: true,
+//   })
+// );
 app.use(cookieParser());
 app.use(express.json());
 
@@ -22,7 +47,6 @@ app.post('/login', auth.login);
 app.use(md);
 app.post('/logout', auth.logout);
 
-// Define dashboard routes based on user type using router.use
 app.use('/', (req, res, next) => {
   const userType = req.cookies.userType;
   console.log('main route');
@@ -41,7 +65,6 @@ app.get('/verify', (req, res) => {
   res.status(200).send("Hello from the root route!");
 });
 
-// app.use('/', router);
 app.use((req, res) => {
   res.status(404).send("Page not found");
 });
