@@ -3,7 +3,7 @@ const router = express.Router();
 const Student = require('../db/Models/studentModel');
 const CreateExam=require('../db/Models/CreateExam');
 const ExamResult=require('../db/Models/ExamResult');
-
+const mongoose = require('mongoose');
 
 
 //functions
@@ -12,6 +12,10 @@ const checkExamSubmission = async (req, res, next) => {
   const examId = req.params.examId || req.body.examId; // Allow for both URL parameter and request body
   const stId = req.cookies.id;
 
+  if (!mongoose.Types.ObjectId.isValid(examId)) {
+    return res.status(400).json({ error: `not a valid MongoDB ObjectId: ${examId}` });
+  }
+  
   try {
     const issubmitted = await ExamResult.find({ studentId: stId, examId: examId });
     if (issubmitted.length > 0) {
@@ -27,7 +31,9 @@ const checkExamSubmission = async (req, res, next) => {
   }
 };
 
+checkIsStarted=async(req,res,next)=>{
 
+}
 
 
 
@@ -84,6 +90,7 @@ router.get('/exam/:examId', checkExamSubmission,async (req, res) => {
   try {
     const examId = req.params.examId;
     const stId=req.cookies.id;
+
     
     console.log(examId);
 
@@ -93,6 +100,14 @@ router.get('/exam/:examId', checkExamSubmission,async (req, res) => {
       return res.status(404).json({ error: 'Exam not found' });
     }
 
+    // Get the current date and time
+    const currentTime = new Date();
+
+    // Check if the current time is after the exam's date
+    if (currentTime < exam.date) {
+      // Exam has not started yet
+      return res.status(400).json({ error: 'Exam has not started yet.' ,date:exam.date});
+    }
     res.status(200).json(exam);
   } catch (error) {
     console.error('Error fetching exam:', error);
