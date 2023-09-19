@@ -1,4 +1,4 @@
-const db = process.env.db;
+const db = process.env.DB;
 const mongoose = require('mongoose');
 
 async function connectToDatabase() {
