@@ -29,7 +29,8 @@ const studentSchema = new mongoose.Schema({
       date: Date,
       score: Number
     }
-  ]
+  ],
+  imageUrl:String,
 });
 
 const Student = mongoose.model('Student', studentSchema);

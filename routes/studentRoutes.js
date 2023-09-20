@@ -69,7 +69,7 @@ router.get('/exams', async (req, res) => {
     const [todayExams, upcomingExams, pastExams] = await Promise.all([
       CreateExam.find({ date: { $gte: today, $lt: tomorrow } }).sort({ date: 1 }).exec(),
       CreateExam.find({ date: { $gt: tomorrow } }).sort({ date: 1 }).exec(),
-      CreateExam.find({ date: { $lt: today } }).sort({ date: -1 }).limit(10).exec()
+      CreateExam.find({ date: { $lt: today } }).sort({ date: -1 }).exec()
     ]);
 
     const examsObject = {
@@ -176,6 +176,28 @@ router.post('/exam/submit-exam', checkExamSubmission,async (req, res) => {
   } catch (error) {
     console.error('Error submitting exam:', error);
     res.status(500).json({ error: 'An error occurred while submitting the exam' });
+  }
+});
+
+
+router.get('/exam-results/:stId', async (req, res) => {
+  console.log("exam-result");
+  const { stId } = req.params;
+
+  try {
+    // Use your ExamResult model to find exam results by examId
+    const examResults = await ExamResult.find({ studentId:stId });
+
+    if (!examResults) {
+      return res.status(404).json({ error: 'Exam results not found' });
+    }
+    console.log(examResults);
+
+    // Return the exam results as JSON
+    res.status(200).json(examResults);
+  } catch (error) {
+    console.error('Error fetching exam results:', error);
+    res.status(500).json({ error: 'An error occurred while fetching exam results' });
   }
 });
 

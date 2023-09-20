@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const bodyparser = require('body-parser');
 const d = require('dotenv');
 d.config({ path: './config.env' });
 require('./db/conn');
@@ -36,8 +37,8 @@ app.use(cors(corsOptions));
 //   })
 // );
 app.use(cookieParser());
-app.use(express.json());
-
+// app.use(express.json());
+app.use(bodyparser.json({ limit: '10mb' }));
 const auth = require('./Auth/authenticate');
 const md = auth.middleware;
 

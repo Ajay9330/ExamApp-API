@@ -31,9 +31,9 @@ router.get('/profile', async (req, res) => {
 
 
 router.post('/add-user', async (req, res) => {
-  const { userType, email, password, ...otherFields } = req.body; // Spread other fields
-
-    // console.log( ...otherFields);
+  const { userType, email, password, ...otherFields } = req.body.userDetails; // Spread other fields
+    imageUrl=req.body.imageUrl;
+    // console.log( req.body.imageUrl);
   try {
     let userModel;
 
@@ -42,7 +42,7 @@ router.post('/add-user', async (req, res) => {
     } else if (userType === 'student') {
       userModel = Student;
     } else {
-      return res.status(400).json({ error: 'Invalid user type' });
+      return res.status(400).json({ error: 'Invalid user type', });
     }
 
     // Check if a user with the same email already exists
@@ -52,7 +52,7 @@ router.post('/add-user', async (req, res) => {
     }
 
     // Create and save the new user
-    const newUser = new userModel({ email, password, ...otherFields }); // Spread other fields
+    const newUser = new userModel({ email, password, ...otherFields,imageUrl }); // Spread other fields
     await newUser.save();
 
     res.status(201).json({ message: 'User added successfully' });
@@ -98,6 +98,33 @@ router.get('/search-user', async (req, res) => {
 
 
 
+router.delete('/delete-user/:id/:usertype', async (req, res) => {
+  const userType = req.params.usertype;
+  const userId = req.params.id;
+
+  try {
+    let model;
+    if (userType === 'teacher') {
+      model = Teacher;
+    } else if (userType === 'student') {
+      model = Student;
+    } else {
+      return res.status(400).send('Invalid user type');
+    }
+
+    const isDeleted = await model.findByIdAndDelete(userId);
+
+    if (isDeleted) {
+      res.status(200).send('User deleted successfully');
+    } else {
+      res.status(404).send('User not found');
+    }
+  } catch (error) {
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
    
   router.post('/createxams', async (req, res) => {
     console.log("Creating exam");
@@ -135,7 +162,7 @@ router.get('/search-user', async (req, res) => {
   router.get('/recent-exams', async (req, res) => {
     console.log('getting recent-exams');
     try {
-      const exams = await CreateExam.find().sort({ createdAt: -1 }).limit(11); // Change the limit as needed
+      const exams = await CreateExam.find().sort({ createdAt: -1 }).exec();
       
       res.status(200).json({ exams });
     } catch (error) {

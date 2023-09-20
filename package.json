@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",  
+    "start": "nodemon index.js",
     "build": "npm install"
   },
-  
   "keywords": [],
   "author": "Ajaykumar Yadav",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

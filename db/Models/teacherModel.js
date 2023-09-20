@@ -28,7 +28,7 @@ const teacherSchema = new mongoose.Schema({
       date: Date,
       score: Number
     }
-  ]
+  ],  imageUrl:String,
 });
 
 const Teacher = mongoose.model('Teacher', teacherSchema);
