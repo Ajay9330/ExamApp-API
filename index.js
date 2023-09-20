@@ -36,10 +36,11 @@ app.use(cors(corsOptions));
 //     credentials: true,
 //   })
 // );
-app.use(cookieParser());
-// app.use(express.json());
 app.use(bodyparser.json({ limit: '10mb' }));
 const auth = require('./Auth/authenticate');
+app.use(cookieParser());
+// app.use(express.json());
+
 const md = auth.middleware;
 
 // Placeholder function to simulate generating an authentication token
