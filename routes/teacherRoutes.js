@@ -21,7 +21,7 @@ router.get('/profile', async (req, res) => {
       res.status(404).json({ error: 'Teacher not found' });
       return;
     }
-    console.log(teacherData);
+    //console.log(teacherData);
     res.json({ teacherData });
   } catch (error) {
     console.error('Error fetching teacher profile:', error);
@@ -65,8 +65,7 @@ router.post('/add-user', async (req, res) => {
 
 router.get('/search-user', async (req, res) => {
   const searchQuery = req.query.q;
-
-  console.log(req.query);
+  console.log("searching users by "+req.cookies.email+"=>"+req.query);
 
   try {
     // Search for users in both Teacher and Student models
@@ -88,7 +87,7 @@ router.get('/search-user', async (req, res) => {
     // console.log(studentResults);
 
     const results = [...teacherResults, ...studentResults]; // Combine the results
-    console.log(results);
+    //console.log(results);
     res.status(200).json({ results });
   } catch (error) {
     console.error('Error searching for users:', error);
@@ -101,7 +100,7 @@ router.get('/search-user', async (req, res) => {
 router.delete('/delete-user/:id/:usertype', async (req, res) => {
   const userType = req.params.usertype;
   const userId = req.params.id;
-
+  console.log("deleting users by "+req.cookies.email+"=>"+"usrid:"+userId+" usrtype:"+userType);
   try {
     let model;
     if (userType === 'teacher') {
@@ -113,11 +112,13 @@ router.delete('/delete-user/:id/:usertype', async (req, res) => {
     }
 
     const isDeleted = await model.findByIdAndDelete(userId);
-
+    console.log(isDeleted);
     if (isDeleted) {
       res.status(200).send('User deleted successfully');
     } else {
+      console.log("not deleted,not found");
       res.status(404).send('User not found');
+      
     }
   } catch (error) {
     res.status(500).send('Internal Server Error');
@@ -176,6 +177,7 @@ router.delete('/delete-user/:id/:usertype', async (req, res) => {
   
     try {
       const deletedExam = await CreateExam.findByIdAndDelete(examId);
+      //*const deleteResult=await ExamResult.findOneAndDelete(examId);
       if (!deletedExam) {
         res.status(404).json({ error: 'Exam not found' });
         return;
@@ -201,7 +203,7 @@ router.delete('/delete-user/:id/:usertype', async (req, res) => {
       if (!examResults) {
         return res.status(404).json({ error: 'Exam results not found' });
       }
-      console.log(examResults);
+     // console.log(examResults);
   
       // Return the exam results as JSON
       res.status(200).json(examResults);

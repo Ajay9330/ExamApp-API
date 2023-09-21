@@ -12,7 +12,7 @@ const middleware = (req, res, next) => {
     // console.log(token);
     
     if (!token) {
-        console.log(req.body);
+        //console.log(req.body);
         return res.status(401).json({ error: 'Unauthorized: No token provided' });
     }
 
@@ -61,7 +61,7 @@ async function isValidUser(email, password, userType,newToken) {
             return ([false,'']); // User not found
         }
 
-        console.log("User found:", user); // Print the user object
+       // console.log("User found:", user); // Print the user object
         const passwordMatches = user.password === password;
         if(passwordMatches){
             try {
@@ -91,7 +91,7 @@ async function isValidUser(email, password, userType,newToken) {
 
 function generateAuthToken(email) {
     const secretKey = 'key';
-    const expiresIn = '3000s';
+    const expiresIn = 15 * 24 * 60 * 60; 
     const token = jwt.sign({ email }, secretKey, { expiresIn });
     return token;
   }
@@ -138,16 +138,17 @@ function generateAuthToken(email) {
   }
   
   function logout(req, res) {
-    // Clear the cookies and session data
-    res.clearCookie('userType');
-    res.clearCookie('email');
-    res.clearCookie('obj');
-    res.clearCookie('id');
-    
+    // Clear all cookies
+    res.clearCookie('userType', { sameSite: 'none', secure: true });
+    res.clearCookie('email', { sameSite: 'none', secure: true });
+    res.clearCookie('obj', { sameSite: 'none', secure: true });
+    res.clearCookie('id', { sameSite: 'none', secure: true });
+    res.clearCookie('token', { sameSite: 'none', secure: true });
+  
     // Respond with a success message
     res.json({ message: 'Logged out successfully from server' });
-  };
-
+  }
+  
 module.exports = {
     logout,
     middleware,

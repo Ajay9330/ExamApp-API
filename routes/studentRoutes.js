@@ -49,7 +49,7 @@ router.get('/profile', async (req, res) => {
       res.status(404).json({ error: 'Student not found' });
       return;
     }
-    console.log(studentData);
+    //console.log(studentData);
     res.json({ studentData });
   } catch (error) {
     console.error('Error fetching student profile:', error);
@@ -191,7 +191,7 @@ router.get('/exam-results/:stId', async (req, res) => {
     if (!examResults) {
       return res.status(404).json({ error: 'Exam results not found' });
     }
-    console.log(examResults);
+    //console.log(examResults);
 
     // Return the exam results as JSON
     res.status(200).json(examResults);
