@@ -111,21 +111,28 @@ function generateAuthToken(email) {
         // Set cookies securely with specific options
         res.cookie('token', token, {
           httpOnly: false,
-          sameSite: 'none', // Set to 'none' for cross-origin requests
-          secure: true,     // Set to true for secure connections (HTTPS)
+          sameSite: 'none',
+          secure: true,
+          domain: process.env.DMN  // Set to the parent domain (including subdomains)
         });
+        
         res.cookie('userType', userType, {
           sameSite: 'none',
           secure: true,
+          domain: process.env.DMN
         });
+        
         res.cookie('email', email, {
           sameSite: 'none',
           secure: true,
+          domain: process.env.DMN
         });
+        
         res.cookie('id', id, {
           sameSite: 'none',
           secure: true,
-        });
+          domain: process.env.DMN
+        });        
   
         res.status(200).json({ message: 'Login successful' });
       } else {
