@@ -107,31 +107,37 @@ function generateAuthToken(email) {
   
       const [isValid, id] = await isValidUser(email, password, userType, token);
       console.log(id);
+      const expirationTime = new Date();
+      expirationTime.setHours(expirationTime.getHours() + 1); // 
       if (isValid) {
         // Set cookies securely with specific options
         res.cookie('token', token, {
           httpOnly: false,
           sameSite: 'none',
           secure: true,
-          domain: process.env.DMN  // Set to the parent domain (including subdomains)
+          domain: process.env.DMN , // Set to the parent domain (including subdomains)
+          expires: expirationTime 
         });
         
         res.cookie('userType', userType, {
           sameSite: 'none',
           secure: true,
-          domain: process.env.DMN
+          domain: process.env.DMN,
+          expires: expirationTime 
         });
         
         res.cookie('email', email, {
           sameSite: 'none',
           secure: true,
-          domain: process.env.DMN
+          domain: process.env.DMN,
+          expires: expirationTime 
         });
         
         res.cookie('id', id, {
           sameSite: 'none',
           secure: true,
-          domain: process.env.DMN
+          domain: process.env.DMN,
+          expires: expirationTime 
         });        
   
         res.status(200).json({ message: 'Login successful' });
