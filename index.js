@@ -9,9 +9,10 @@ const studentRoutes = require('./routes/studentRoutes');
 const teacherRoutes = require('./routes/teacherRoutes');
 
 const app = express();
+console.log(`${process.env.DMN}`)
 
 const corsOptions = {
-  origin:true,
+  origin:['https://examapp-qp94.onrender.com','http://localhost:3000'],
   methods: ['GET', 'POST','DELETE'],
   credentials: true,
 };

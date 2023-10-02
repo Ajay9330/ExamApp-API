@@ -115,28 +115,28 @@ function generateAuthToken(email) {
           httpOnly: false,
           sameSite: 'none',
           secure: true,
-          domain: process.env.DMN , // Set to the parent domain (including subdomains)
+          domain: `${process.env.DMN}` , 
           expires: expirationTime 
         });
         
         res.cookie('userType', userType, {
           sameSite: 'none',
           secure: true,
-          domain: process.env.DMN,
+          domain: `${process.env.DMN}`,
           expires: expirationTime 
         });
         
         res.cookie('email', email, {
           sameSite: 'none',
           secure: true,
-          domain: process.env.DMN,
+          domain: `${process.env.DMN}`,
           expires: expirationTime 
         });
         
         res.cookie('id', id, {
           sameSite: 'none',
           secure: true,
-          domain: process.env.DMN,
+          domain: `${process.env.DMN}`,
           expires: expirationTime 
         });        
   
