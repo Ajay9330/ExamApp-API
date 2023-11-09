@@ -154,7 +154,7 @@ router.post('/exam/submit-exam', checkExamSubmission,async (req, res) => {
     // Calculate the score based on correct answers
     score = updatedStudentAnswers.filter((answer) => answer.isCorrect).length;
 
-    console.log('Updated Student Answers:', updatedStudentAnswers); // Debugging
+    // console.log('Updated Student Answers:', updatedStudentAnswers); // Debugging
 
     // Create a new exam result document and save it to MongoDB
     const examResult = new ExamResult({

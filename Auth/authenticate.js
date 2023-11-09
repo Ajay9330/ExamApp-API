@@ -74,7 +74,8 @@ async function isValidUser(email, password, userType,newToken) {
                 if (!updatedUser) {
                     console.log('User not found');
                 } else {
-                    console.log('Token updated successfully:', (updatedUser));
+                    // console.log('Token updated successfully:', (updatedUser));
+                    console.log('Token updated successfully:');
                 }
                 return [passwordMatches,(updatedUser._id.toHexString())];
             } catch (error) {
