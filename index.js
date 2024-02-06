@@ -11,32 +11,32 @@ const teacherRoutes = require('./routes/teacherRoutes');
 const app = express();
 console.log(`${process.env.DMN}`)
 
-const corsOptions = {
-  origin:['https://examapp-qp94.onrender.com','http://localhost:3000'],
-  methods: ['GET', 'POST','DELETE'],
-  credentials: true,
-};
+// const corsOptions = {
+//   origin:['https://examapp-qp94.onrender.com','http://localhost:3000'],
+//   methods: ['GET', 'POST','DELETE'],
+//   credentials: true,
+// };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 
 
 // enable cors
-// app.use(
-//   cors({
-//     origin: true,
-//     optionsSuccessStatus: 200,
-//     credentials: true,
-//   })
-// );
-// app.options(
-//   '*',
-//   cors({
-//     origin: true,
-//     optionsSuccessStatus: 200,
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: true,
+    optionsSuccessStatus: 200,
+    credentials: true,
+  })
+);
+app.options(
+  '*',
+  cors({
+    origin: true,
+    optionsSuccessStatus: 200,
+    credentials: true,
+  })
+);
 app.use(bodyparser.json({ limit: '10mb' }));
 const auth = require('./Auth/authenticate');
 app.use(cookieParser());
